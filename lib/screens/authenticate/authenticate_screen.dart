@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase/common/constante.dart';
+import 'package:flutter_firebase/common/constants.dart';
 import 'package:flutter_firebase/common/loading.dart';
+import 'package:flutter_firebase/services/authentification.dart';
 
 class AuthenticateScreen extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class AuthenticateScreen extends StatefulWidget {
 class _AuthenticateScreenState extends State<AuthenticateScreen> {
   // pour valider les champs de saisie et voir si ils sont vide
   final _formKey = GlobalKey<FormState>();
+  final AuthenticationService _auth = AuthenticationService();
   String error = '';
   //loading permet de rafraichir la vue quand c'est à true
   // et de mettre un loader(logo) sur la vue
@@ -55,7 +57,7 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
           backgroundColor: Colors.blueGrey,
           elevation: 0.0,
           title: Text(
-            showSignIn ? 'Sign in to water Social'
+            showSignIn ? 'RegisterSign in to water Social'
                 : 'Register',
           ),
           actions: <Widget>[
@@ -65,8 +67,9 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                   color: Colors.white
               ),
               //TODO: à changer
-              label: Text(showSignIn ? 'Sign in to water Social'
-                  : 'Register',
+              label: Text(
+                showSignIn ? 'Register'
+                    : 'Sign in to water Social',
                 style: TextStyle(
                     color: Colors.white
                 ),
@@ -116,7 +119,9 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                     showSignIn ? "Sign In" : "Register",
                     style: TextStyle(color:Colors.white),
                   ),
-                  onPressed: () {
+                  // methode async pour celle lié au user donc on ajoute
+                  // // async au bouton
+                  onPressed: () async {
                     // on valide le formulaire
                       if(_formKey.currentState!.validate()){
                         // on va faire une anim de chargement
@@ -124,9 +129,11 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                         var password = passwordController.value.text;
                         var email = emailController.value.text;
 
-                        // TODO cale firebase auth
+
                         // on fit semblant d'appeler firebase pour linstant
-                        dynamic result = null;
+                        dynamic result = showSignIn ?
+                        await _auth.signInWithEmailAndPassword(email, password)
+                        : await _auth.registerWithEmailAndPassword(email, password);
                         // si l'appelle à firebase echoue alors message derreur
                         if(result == null){
                           setState(() {
