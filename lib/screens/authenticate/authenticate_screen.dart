@@ -18,6 +18,7 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
   bool loading = false;
 
   final emailController = TextEditingController();
+  final nameController = TextEditingController();
   final passwordController = TextEditingController();
   bool showSignIn = true;
 
@@ -26,6 +27,7 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
   @override
   void dispose() {
     emailController.dispose();
+    nameController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -40,6 +42,7 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
       _formKey.currentState!.reset();
       error = '';
       emailController.text = '';
+      nameController.text = '';
       passwordController.text = '';
       showSignIn = !showSignIn;
     });
@@ -93,14 +96,21 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
             // en dessous
             child: ListView(
               children: [
+                !showSignIn
+                    ? TextFormField(
+                  controller: nameController,
+                  decoration: textInputDecoration.copyWith(hintText: 'name'),
+                  validator: (value) =>
+                  value == null || value.isEmpty ? "Enter a name" : null,
+                )
+                    : Container(),
+                !showSignIn ? SizedBox(height: 10.0) : Container(),
                 TextFormField(
                   controller: emailController,
-                  //placeholder avec un copyWith(hintText:)
                   decoration: textInputDecoration.copyWith(hintText: 'email'),
-                  validator: (value) => value!.isEmpty ?
-                  "Enter an email" : null,
+                  validator: (value) =>
+                  value == null || value.isEmpty ? "Enter an email" : null,
                 ),
-                //separateur de form
                 SizedBox(height: 10.0),
                 TextFormField(
                   controller: passwordController,
@@ -108,8 +118,8 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                   decoration: textInputDecoration.copyWith(hintText: 'password'),
                   obscureText: true,
                   validator: (value) =>
-                      // minimum pour firebase 5 caracteres
-                      value!.length < 6 ?
+                  // minimum pour firebase 5 caracteres
+                  value!.length < 6 ?
                   "Enter a password with at least 6 characteres" :
                   null,
                 ),
@@ -123,36 +133,37 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                   // // async au bouton
                   onPressed: () async {
                     // on valide le formulaire
-                      if(_formKey.currentState!.validate()){
-                        // on va faire une anim de chargement
-                        setState(() => loading = true);
-                        var password = passwordController.value.text;
-                        var email = emailController.value.text;
+                    if(_formKey.currentState!.validate()){
+                      // on va faire une anim de chargement
+                      setState(() => loading = true);
+                      var password = passwordController.value.text;
+                      var email = emailController.value.text;
+                      var name = nameController.value.text;
 
 
-                        // on fit semblant d'appeler firebase pour linstant
-                        dynamic result = showSignIn ?
-                        await _auth.signInWithEmailAndPassword(email, password)
-                        : await _auth.registerWithEmailAndPassword(email, password);
-                        // si l'appelle à firebase echoue alors message derreur
-                        if(result == null){
-                          setState(() {
-                            loading = false;
-                            error = "Please supply a valid email";
-                          });
-                        }
+                      // on fit semblant d'appeler firebase pour linstant
+                      dynamic result = showSignIn ?
+                      await _auth.signInWithEmailAndPassword(email, password)
+                          : await _auth.registerWithEmailAndPassword(name,email, password);
+                      // si l'appelle à firebase echoue alors message derreur
+                      if(result == null){
+                        setState(() {
+                          loading = false;
+                          error = "Please supply a valid email";
+                        });
                       }
+                    }
                   },
                 ),
                 SizedBox(height: 10.0),
-              Text(
-                    error,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 15,
-                    ),
+                Text(
+                  error,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 15,
                   ),
+                ),
               ],
             ),
           ),

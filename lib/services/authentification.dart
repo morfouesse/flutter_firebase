@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_firebase/models/user.dart';
+import 'package:flutter_firebase/services/database.dart';
 
 
 class AuthenticationService{
@@ -37,16 +38,21 @@ class AuthenticationService{
   }
 
   // retourne un utilisateur
-  Future registerWithEmailAndPassword(String email, String password) async {
+  Future registerWithEmailAndPassword(String name, String email, String password) async {
     try {
       //Credential pour les objets de firebase
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User? user = result.user;
 
+      if (user == null) {
+        throw Exception("No user found");
+      } else {
+        await DatabaseService(user.uid).saveUser(name, 0);
+      }
+
       return _userFromFirebaseUser(user);
 
-      //TODO firestore
 
     } // pour gerer les erreurs de firebase
     catch (exception) {
