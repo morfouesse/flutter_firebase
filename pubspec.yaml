@@ -25,7 +25,7 @@ dependencies:
     sdk: flutter
   firebase_core: "^1.2.0"
   firebase_auth: "^1.2.0"
-  #firebase_crashlytics: "^2.0.4"
+  firebase_crashlytics: "^2.0.7"
   #pour le web firestore #m
   cloud_firestore: "^2.2.0"
   # pour faire simplement les requetes

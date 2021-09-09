@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'models/user.dart';
@@ -11,11 +12,12 @@ import 'package:provider/provider.dart';
    // faire inisialiser firebase simplement
    WidgetsFlutterBinding.ensureInitialized();
    await Firebase.initializeApp();
-//   // if (!kIsWeb) {
-//   //   await FirebaseCrashlytics.instance
-//   //       .setCrashlyticsCollectionEnabled(kDebugMode ? false : true);
-//   //   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-//   // }
+   // si on est pas sur le web( ne fct pas sur le web)
+ if (!kIsWeb) {
+   await FirebaseCrashlytics.instance
+       .setCrashlyticsCollectionEnabled(kDebugMode ? false : true);
+   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+ }
    runApp(MyApp());
  }
 
@@ -23,6 +25,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // on simule un crash
+    //FirebaseCrashlytics.instance.crash();
     // on écoute le user grace au stream
     // pour avoir le user courant
       return StreamProvider<AppUser?>.value(
